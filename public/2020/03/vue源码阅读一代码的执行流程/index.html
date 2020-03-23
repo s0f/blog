@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-cn"><head>
+    
+
+
+
+
+
+<title>Vue源码阅读一、代码的执行流程 | ssf</title>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content='主要是从Vue创建实例开始，看它代码的执行过程，跟着这个过程来阅读Vue的源码，学习Vue的一些底层原理，通过把整个流程跑通后，再去仔细阅读Vue在一些细节上是怎么实现的'>
+<meta name="keywords" content='Vue源码阅读, Vue'>
+<meta name="msapplication-TileColor" content="#b91d47">
+<meta name="theme-color" content="#ffffff">
+
+<link rel="canonical" href="http://devjs.online/2020/03/vue%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%80%E4%BB%A3%E7%A0%81%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" />
+<link rel="apple-touch-icon" sizes="180x180" href='/apple-touch-icon.png'>
+<link rel="icon" type="image/png" sizes="32x32" href='/favicon-32x32.png'>
+<link rel="icon" type="image/png" sizes="16x16" href='/favicon-16x16.png'>
+<link rel="manifest" href='/site.webmanifest'>
+<link rel="mask-icon" href='/safari-pinned-tab.svg' color="#696969">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="theme-color" content="#ffffff">
+
+<meta property="og:title" content="Vue源码阅读一、代码的执行流程" />
+<meta property="og:description" content="主要是从Vue创建实例开始，看它代码的执行过程，跟着这个过程来阅读Vue的源码，学习Vue的一些底层原理，通过把整个流程跑通后，再去仔细阅读Vue在一些细节上是怎么实现的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://devjs.online/2020/03/vue%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%80%E4%BB%A3%E7%A0%81%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" />
+<meta property="article:published_time" content="2020-03-16T23:19:01+08:00" />
+<meta property="article:modified_time" content="2020-03-16T23:19:01+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Vue源码阅读一、代码的执行流程"/>
+<meta name="twitter:description" content="主要是从Vue创建实例开始，看它代码的执行过程，跟着这个过程来阅读Vue的源码，学习Vue的一些底层原理，通过把整个流程跑通后，再去仔细阅读Vue在一些细节上是怎么实现的"/>
+
+<meta itemprop="name" content="">
+<meta itemprop="description" content="">
+    
+    
+    
+    
+    
+    <link rel="stylesheet" href='/css/style.css'>
+
+    
+
+</head><body><header id="navigation" class="p-navigation">
+    <div class="p-navigation__row">
+        <div class="p-navigation__banner">
+            <div class="p-navigation__logo">
+                <a class="p-navigation__link u-vertically-center p-link--logo" href="http://devjs.online/">
+                    ssf
+                </a>
+            </div>
+            
+            <a href="#navigation" class="p-navigation__toggle--open" title="menu">
+                <i class="p-icon--menu"></i>
+            </a>
+            <a href="#navigation-closed" class="p-navigation__toggle--close" title="close menu">
+                <i class="p-icon--close"></i>
+            </a>
+        </div>
+
+        <nav class="p-navigation__nav">
+            <span class="u-off-screen">
+                <a href="#main-content">Jump to main content</a>
+            </span>
+
+            <ul class="p-navigation__items" role="menu">
+                
+                <li class="p-navigation__item" role="menuitem">
+                    <a class="p-navigation__link" href="http://devjs.online/">首页</a>
+                </li>
+                
+                <li class="p-navigation__item" role="menuitem">
+                    <a class="p-navigation__link" href="http://devjs.online/post/">文章</a>
+                </li>
+                
+                <li class="p-navigation__item" role="menuitem">
+                    <a class="p-navigation__link" href="http://devjs.online/tags/">标签</a>
+                </li>
+                
+                <li class="p-navigation__item" role="menuitem">
+                    <a class="p-navigation__link" href="http://devjs.online/categories/">分类</a>
+                </li>
+                
+                <li class="p-navigation__item" role="menuitem">
+                    <a class="p-navigation__link" href="http://devjs.online/about/">关于</a>
+                </li>
+                
+            </ul>
+
+            
+            <form class="p-search-box" action="https://www.google.com/search" target="_blank">
+    <input type="search" class="p-search-box__input" name="q" placeholder='Search'
+        required="" aria-label="Query">
+    <input type="hidden" name="sitesearch" value="http://devjs.online/">
+    <button type="reset" class="p-search-box__reset" alt="reset" aria-label="Reset">
+        <i class="p-icon--close"></i>
+    </button>
+    <button type="submit" class="p-search-box__button" alt="search" aria-label="Search">
+        <i class="p-icon--search"></i>
+    </button>
+</form>
+            
+        </nav>
+    </div>
+</header><div id="main-content">
+<header class="p-strip page-banner">
+    <div class="row">
+        <h1>Vue源码阅读一、代码的执行流程</h1>
+    </div>
+
+    
+
+<div class="row">
+
+    
+    <div class="col-8">
+        
+
+
+
+
+<div class="p-media-object">
+
+    
+
+    <div class="p-media-object__details">
+
+        
+
+        
+        <p class="p-media-object__content">
+            <span class="u-capitalized">on</span>
+            2020-03-16
+        </p>
+        
+
+    </div>
+</div>
+
+
+    </div>
+    
+
+    
+    <div class="col-4  col--share-links ">
+        <ul class="p-inline-list-icons p-inline-list-icons--share-links u-no-padding--left u-no-margin--left u-unselectable">
+    <li class="p-inline-list__item">
+        <i class="p-icon--share"></i>
+    </li>
+    <li class="p-inline-list__item">
+        <a class="p-icon--facebook" title='Share on Facebook' target="_blank"
+            rel="noreferrer" href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fdevjs.online%2f2020%2f03%2fvue%25E6%25BA%2590%25E7%25A0%2581%25E9%2598%2585%25E8%25AF%25BB%25E4%25B8%2580%25E4%25BB%25A3%25E7%25A0%2581%25E7%259A%2584%25E6%2589%25A7%25E8%25A1%258C%25E6%25B5%2581%25E7%25A8%258B%2f">
+            Facebook
+        </a>
+    </li>
+    <li class="p-inline-list__item">
+        <a class="p-icon--twitter" title='Share on Twitter' target="_blank"
+            rel="noreferrer" href="http://twitter.com/share?text=Vue%e6%ba%90%e7%a0%81%e9%98%85%e8%af%bb%e4%b8%80%e3%80%81%e4%bb%a3%e7%a0%81%e7%9a%84%e6%89%a7%e8%a1%8c%e6%b5%81%e7%a8%8b&amp;url=http%3a%2f%2fdevjs.online%2f2020%2f03%2fvue%25E6%25BA%2590%25E7%25A0%2581%25E9%2598%2585%25E8%25AF%25BB%25E4%25B8%2580%25E4%25BB%25A3%25E7%25A0%2581%25E7%259A%2584%25E6%2589%25A7%25E8%25A1%258C%25E6%25B5%2581%25E7%25A8%258B%2f">
+            Twitter
+        </a>
+    </li>
+    <li class="p-inline-list__item">
+        <a class="p-icon--linkedin" title='Share on LinkedIn' target="_blank"
+            rel="noreferrer"
+            href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fdevjs.online%2f2020%2f03%2fvue%25E6%25BA%2590%25E7%25A0%2581%25E9%2598%2585%25E8%25AF%25BB%25E4%25B8%2580%25E4%25BB%25A3%25E7%25A0%2581%25E7%259A%2584%25E6%2589%25A7%25E8%25A1%258C%25E6%25B5%2581%25E7%25A8%258B%2f&amp;title=Vue%e6%ba%90%e7%a0%81%e9%98%85%e8%af%bb%e4%b8%80%e3%80%81%e4%bb%a3%e7%a0%81%e7%9a%84%e6%89%a7%e8%a1%8c%e6%b5%81%e7%a8%8b">
+            LinkedIn
+        </a>
+    </li>
+</ul>
+    </div>
+    
+
+</div>
+
+
+
+
+<div class="row">
+    <div class="col-12">
+        
+<a href="http://devjs.online/tags/vue%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">#Vue源码阅读</a>&ensp;
+
+<a href="http://devjs.online/tags/vue/">#Vue</a>&ensp;
+
+    </div>
+</div>
+
+</header>
+
+<section class="p-strip is-shallow">
+    <main class="row post-content">
+        <p>主要是从Vue创建实例开始，看它代码的执行过程，跟着这个过程来阅读Vue的源码，学习Vue的一些底层原理，通过把整个流程跑通后，再去仔细阅读Vue在一些细节上是怎么实现的。</p>
+<h3 id="入口">入口</h3>
+<p>有多个不同的打包入口文件，跟平台与是否加载模板编译库有关，作用是会注入一些跟运行平台相关的属性与方法。现在主要看的是Web平台，也就是浏览器相关的文件</p>
+<ul>
+<li>
+<p>platforms/web/runtime/index.js 从core/index.js 导入Vue构造函数</p>
+<ul>
+<li>$mount  Vue原型添加$mount方法，浏览器环境下根据el获取dom，作为挂载点，调用mountComponent</li>
+<li>注入 _<em>patch_</em>  方法 (core/vdom/patch.js  createPatchFunction), 用来创建vnode</li>
+<li>directives 与 components 注入Vue自带指令与组件</li>
+</ul>
+</li>
+<li>
+<p>platforms/web/entry-runtime.js 运行时版本 直接导出 runtime/index.js 下 Vue 构造函数</p>
+</li>
+<li>
+<p>platforms/web/entry-runtime-with-compiler.js 运行时带编译器版本</p>
+<ul>
+<li>保存原型上$mount，覆盖原型上的 $mount，也就是runtime/index.js中定义的$mount， 如果配置中不存在render方法，将从template属性获取模板。
+如果没有template，将从el属性获取dom并将内容作为模板</li>
+<li>根据获取到的template，调用 compileToFunctions(template) 方法创建render函数，赋值给 vm.options.render</li>
+<li>调用原来的$mount方法</li>
+<li>Vue.compile = compileToFunctions</li>
+</ul>
+</li>
+<li>
+<p>core/index.js</p>
+<ul>
+<li>initGlobalAPI 扩展Vue全局API
+<ul>
+<li>set/delete/nextTick</li>
+<li>component/directive/filter Vue.options[xxx] 添加存放通过全局API注册的功能</li>
+<li>注册全局组件 keep-alive</li>
+<li>initUse(Vue) 提供插件安装函数 Vue.use</li>
+<li>initMixin(Vue)  提供Vue.mixin</li>
+<li>initExtend(Vue) 提供Vue.extend，作用是创建一个Vue的子类，这也是使用Vue.component注册组件时，用来创建组件的方法</li>
+<li>initAssetRegisters(Vue) 过Vue.[component, directive, filter]定义或获取全局可用的component、directive、filter</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>core/instance/index.js</strong> 这里是定义Vue构造函数的地方</p>
+<ul>
+<li>function Vue(options){ this.<strong><strong>init</strong></strong>(options) }  通过init方法来启动Vue实例的创建</li>
+<li>initMixin(Vue)</li>
+<li>stateMixin(Vue)</li>
+<li>eventsMixin(Vue)</li>
+<li>lifecycleMixin(Vue)</li>
+<li>renderMixin(Vue)</li>
+</ul>
+</li>
+</ul>
+<h3 id="initmixin">initMixin</h3>
+<ul>
+<li>混入 init 相关功能，初始化一些内部参数。并调用 $mount 挂载元素</li>
+<li>initLifecycle
+<ul>
+<li>$parent
+options 中有parent属性，如果没有parent，即代表是root元素</li>
+<li>$root
+如果没有parent，即代表是root元素，属性取值为当前元素</li>
+<li>children</li>
+<li>$refs</li>
+<li>_watcher</li>
+<li>_inactive</li>
+<li>_directInactive</li>
+<li>_isMounted</li>
+<li>_isDestroyed</li>
+<li>_isBeginDestroyed</li>
+</ul>
+</li>
+<li>initEvents</li>
+<li>initRender</li>
+<li><strong>hook beforeCreated</strong></li>
+<li>initInjections</li>
+<li>initState</li>
+<li>initProvide</li>
+<li><strong>hook created</strong></li>
+<li>vm.$mount <strong>调用原型上的$mount方法，在不同平台上运行时，这个方法是由不同平台的代码提供的。</strong> 
+在web平台，会覆盖Vue原型上的$mount方法，对模板进行解析编译，返回一个render函数，然后在调用原来的$mount方法。
+这里的render为一个调用createElement创建vnode的函数。这个函数里，会访问到响应式数据，触发get，进行以来收集
+<ul>
+<li>mountComponent</li>
+<li><strong>hook beforeMount</strong></li>
+<li>updateComponent
+vm._update(vm._render())</li>
+<li>new Watcher()</li>
+<li><strong>hook mounted</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="initevents">initEvents</h4>
+<p>为实例创建一个events数组，存放events回调，如果options中有 parentListeners，则调用 updateComponentListeners。作为root元素，
+这个属性为undefined</p>
+<ul>
+<li>_events</li>
+<li>_hasHookEvent</li>
+</ul>
+<h4 id="initrender">initRender</h4>
+<ul>
+<li>解析slots</li>
+<li>绑定 _c 与 $createElement两个函数，_c 在经过编译的模板中，用来创建VNode的方法</li>
+<li>响应式$attrs (得到父元素的attrs)</li>
+<li>响应式$listeners (得到父元素的options._parentListeners)</li>
+</ul>
+<h3 id="触发beforecreated-回调">触发beforeCreated 回调</h3>
+<p>面试问题：你知道beforeCreate的触发时机吗，它是在初始化哪些内容后被触发？</p>
+<h4 id="initinjections-注入">initInjections 注入</h4>
+<h4 id="initstate------初始化响应数据">initState      初始化响应数据</h4>
+<ul>
+<li>_watchers 定义观察者数组，用来收集观察者</li>
+<li>initProps 如果有定义props，初始化props</li>
+<li>initMethods</li>
+<li>initData 这里就是初始化响应式数据的地方了，重点
+<ul>
+<li>proxy(vm, &ldquo;_data&rdquo;, key)  创建_data, 将 data 上的属性, 响应化后挂到_data中，代码中可通过this.xxx访问到_data上的数据
+_data 就是响应化后的data</li>
+<li>observe(data, asRoot:true) 定义观察者，进行以来收集
+<ul>
+<li>避免循环观察</li>
+<li>Observer</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>initComputed</li>
+<li>initWatch</li>
+</ul>
+<h3 id="statemixin">stateMixin</h3>
+<ul>
+<li>$data/$props</li>
+<li>$watch/$set/$delete 原型上添加set/delete方法，修复defineProperty无法监听添加删除属性的缺陷</li>
+</ul>
+<h3 id="eventsmixin">eventsMixin</h3>
+<ul>
+<li>$on/$once/$emit/$off 原型添加以上方法，实现vue实例的观察者/监听者模式</li>
+<li>$on
+<ul>
+<li>$on(&lsquo;hook:xx&rsquo;) 订阅hook事件，设置实例 vm._hasHookEvent 为true，在 hook事件调用时，会根据这个标记调用相应hook回调</li>
+</ul>
+</li>
+</ul>
+<h3 id="lifecyclemixin">lifecycleMixin</h3>
+<ul>
+<li>_update() 第一次挂载和以后的数据更新都会调用此方法去更新视图，有一个isMount属性来区分
+<ul>
+<li><strong>patch</strong>() 区分第一次渲染与更新渲染，
+<ul>
+<li>createElm()
+<ul>
+<li>createChildren() 编译children数组，对每个children逐个调用createElm()</li>
+<li>createComponent() 如果children为component
+<ul>
+<li>componentVNodeHooks.init()
+<ul>
+<li>child.$mount()</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>vnode.elm = nodeOps.createTextNode(vnode.text)/createElement/createComment;</li>
+<li>insert(parentElm, vnode.elm, refElm);</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>vue</strong> 会在 $el 上绑定当前对应的vue实例</li>
+</ul>
+</li>
+<li>$destroy
+<ul>
+<li>删除dom、watcher、vnode、listener</li>
+<li>hook beforeDestroy</li>
+<li>hook destroy</li>
+</ul>
+</li>
+<li>foreUpdate</li>
+</ul>
+<h3 id="rendermixin-往原型上添加render相关的函数">renderMixin 往原型上添加render相关的函数</h3>
+<ul>
+<li>installRenderHelpers  给原型上绑定一些快捷方法
+<ul>
+<li>_l renderList</li>
+<li>_n toNumber</li>
+<li>_s toString</li>
+</ul>
+</li>
+<li>$nextTick</li>
+<li>_render 调用options.render() 创建vnode
+<ul>
+<li>vm.$options.render.call(vm._renderProxy, vm.$createElement)  这里render函数，就是模板编译后生成的render函数，通过这段
+函数创建Vnode</li>
+</ul>
+</li>
+</ul>
+<h3 id="observervalue-传入-data-对象">Observer(value) 传入 data 对象</h3>
+<ul>
+<li>dep Dep实例</li>
+<li><strong>ob</strong> 已经观察</li>
+<li>walk(obj: Object) 对数据类型为对象的进行响应式处理</li>
+<li>observeArray(items: Array<!-- raw HTML omitted -->) 对数组进行响应式处理</li>
+<li>defineReactive(obj, key, value) 重点，定义依赖收集
+<ul>
+<li>dep Dep实例 每个key都会有个dep实例保存在defineReactive的闭包中</li>
+<li>observe</li>
+</ul>
+</li>
+</ul>
+<h3 id="watcher">Watcher</h3>
+<ul>
+<li>newDeps 依赖收集阶段，用来收集本组件模板中被使用到的属性的依赖（dep对象）</li>
+<li>get() 调用 expOrFn， 触发依赖收集
+<ul>
+<li>pushTarget(this)</li>
+<li>this.getter.call(vm, vm) getter 为updateComponent
+<ul>
+<li>updateComponent</li>
+<li>vm._update(vm._render()) // _render在 render.js renderMixin 定义
+调用模板编译返回的render函数，创建该组件的vnode并返回给 _update()
+调用diff算法对比新旧vnode，进行dom操作</li>
+<li>_<em>patch_</em>() 挂载
+<ul>
+<li>createElm</li>
+<li>createChildren</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>popTarget()</li>
+</ul>
+</li>
+<li>pushTarget  popTarget
+将当前的Watcher实例设置为Dep静态属性target，用在属性get中，进行依赖收集，这里是关键。popTarget 作用是
+收集依赖后清除target</li>
+<li>update()
+<ul>
+<li>queueWatcher() // 异步更新视图</li>
+</ul>
+</li>
+<li>cleanupDeps</li>
+</ul>
+<h3 id="dep">Dep</h3>
+<ul>
+<li>target 指向当前正在收集依赖的Watcher</li>
+<li>subs() 收集Watcher</li>
+<li>depend() 通过Watcher收集dep实例
+<ul>
+<li>Dep.target.addDep(this)</li>
+</ul>
+</li>
+<li>notify() 通知Watcher数据更新了
+<ul>
+<li>subs[i].update()</li>
+</ul>
+</li>
+<li>pushTarget()/popTarget() 设置target</li>
+</ul>
+<h3 id="compiler-编译模板">Compiler 编译模板</h3>
+<ul>
+<li>
+<p>mountComponent 创建一个函数，做为当前组件的Watcher的一个expOrFn
+updateComponent = () =&gt; { vm._update(vm._render()) }</p>
+</li>
+<li>
+<p>new Watcher(vm, updateComponent)</p>
+</li>
+<li>
+<p>createCompilerCreator 返回一个 createCompiler 函数</p>
+<ul>
+<li>createCompiler</li>
+<li>baseCompile</li>
+<li>parse html 转换 AST</li>
+</ul>
+</li>
+<li>
+<p>createElement</p>
+<ul>
+<li>with</li>
+<li>simpleNormalizeChildren(children)</li>
+</ul>
+</li>
+<li>
+<p>parse 解析vue的各种指令、表达式 \vue\src\compiler\parser\index.js</p>
+<ul>
+<li>processAttrs</li>
+<li>processIf</li>
+<li>processFor</li>
+</ul>
+</li>
+<li>
+<p>模板执行</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#e6db74">`&lt;div id=&#34;box&#34;&gt;
+</span><span style="color:#e6db74">	{{ name }}
+</span><span style="color:#e6db74">	{{ age }}
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">	&lt;p&gt;用户名： {{ name }}&lt;/p&gt;
+</span><span style="color:#e6db74">	&lt;child v-if=&#34;showChild&#34; :name=&#34;name&#34;&gt;&lt;/child&gt;
+</span><span style="color:#e6db74">&lt;/div&gt;`</span>
+
+<span style="color:#a6e22e">Vue</span>.<span style="color:#a6e22e">component</span>(<span style="color:#e6db74">&#39;child&#39;</span>, {
+  <span style="color:#a6e22e">template</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`&lt;h1&gt;Child,show parent name: {{name}}&lt;/h1&gt;`</span>,
+  <span style="color:#a6e22e">props</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#39;name&#39;</span>],
+})
+
+<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Vue</span>({
+  <span style="color:#a6e22e">el</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;#box&#39;</span>, 
+  <span style="color:#a6e22e">data</span>() {
+      <span style="color:#66d9ef">return</span> {
+          <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;init Name&#39;</span>,
+          <span style="color:#a6e22e">age</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">12</span>,
+          <span style="color:#a6e22e">showChild</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+      }
+  },
+})
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">/*
+</span><span style="color:#75715e">执行顺序
+</span><span style="color:#75715e">1. name
+</span><span style="color:#75715e">2. age
+</span><span style="color:#75715e">3. createTextVNode
+</span><span style="color:#75715e">4. name
+</span><span style="color:#75715e">5. createTextVNode
+</span><span style="color:#75715e">6. _createElement(&#39;p&#39;)
+</span><span style="color:#75715e">7. createTextVNode(&#39; &#39;)
+</span><span style="color:#75715e">8. cihldCancel
+</span><span style="color:#75715e">9. name
+</span><span style="color:#75715e">10. _createElement(&#39;child&#39;)
+</span><span style="color:#75715e">11. _createElement(&#39;div&#39;) */</span>
+
+<span style="color:#a6e22e">_createElement</span>(<span style="color:#e6db74">&#39;div&#39;</span>, {<span style="color:#a6e22e">attrs</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#34;id&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;box&#34;</span>}}, [
+    <span style="color:#a6e22e">createTextVNode</span>(<span style="color:#e6db74">&#34;\n\t&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">toString</span>(<span style="color:#a6e22e">name</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\n\t&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">toString</span>(<span style="color:#a6e22e">age</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\n\n\t&#34;</span>),
+    <span style="color:#a6e22e">_createElement</span>(<span style="color:#e6db74">&#39;p&#39;</span>, [<span style="color:#a6e22e">createTextVNode</span>(<span style="color:#e6db74">&#34;用户名： &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">toString</span>(<span style="color:#a6e22e">name</span>))]),
+    <span style="color:#a6e22e">createTextVNode</span>(<span style="color:#e6db74">&#34; &#34;</span>),
+    (<span style="color:#a6e22e">cihldCancel</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">_createElement</span>(<span style="color:#e6db74">&#39;child&#39;</span>, {<span style="color:#a6e22e">attrs</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">name</span>}}) <span style="color:#f92672">:</span> <span style="color:#a6e22e">_e</span>()
+], <span style="color:#ae81ff">1</span>) 
+</code></pre></div><h3 id="directives">Directives</h3>
+<ul>
+<li>v-html</li>
+<li>v-model</li>
+<li>v-text</li>
+<li>v-for</li>
+<li>v-if</li>
+</ul>
+<h3 id="virtual-dom">Virtual Dom</h3>
+<ul>
+<li>diff</li>
+<li>patch
+<ul>
+<li>patchChildren
+<ul>
+<li>createKeyToOldIdx 返回一个对象，key为 子节点的 key属性，value为子节点的位置index</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>树diff的时间复杂度 O(n^3)，不可用，优化到 O(n)
+<ul>
+<li>比较同层tag</li>
+<li>tag不同，直接删除重建，不再深度比较</li>
+<li>tag与key相同，不再深度比较</li>
+</ul>
+</li>
+<li>_v createTextVNode</li>
+<li>createComponent</li>
+</ul>
+<h3 id="问题">问题</h3>
+<ul>
+<li>Vue.component(id, options) 的过程是怎样的, 他的创建时机？
+<ul>
+<li>VueComponent 注册一个component，会调用Vue.extend(options) 返回一个VueComponent构造函数，并缓存起来，
+创建实例时，调用Vue.ini方法创建Vue实例，VueComponent继承自Vue，
+同时也有与Vue相同的一些全局API &lsquo;extend, mixin, use, component, filter, directive, options, cid&rsquo;
+<ul>
+<li>VueComponent.options</li>
+</ul>
+</li>
+<li>最后通过createComponent方式创建
+<ul>
+<li>componentVNodeHooks</li>
+<li>createComponentInstanceForVnode</li>
+<li>new vnode.componentOptions.Cto(options) 这里是VueComponent 构造函数
+<ul>
+<li>Vue._init(options)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>vnode如何表示一个component？ vnode与一般html标签一致，就看_c 就是 createElement 方法如何处理 component了
+<ul>
+<li>_c(&lsquo;child&rsquo;,{attrs:{&ldquo;name&rdquo;:name}}) <!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+<li>createElement 方法如何处理 component? 最后返回一个vnode vm._update(vnode)
+<ul>
+<li>vnode = new VNode // 如果是html标签</li>
+<li>vnode = createComponent() // 一个component</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+    </main>
+</section>
+
+
+<footer class="p-strip is-wrapper">
+    <div class="row">
+        <div class="p-article-pagination">
+    
+
+    
+
+    
+</div>
+    </div>
+</footer>
+
+
+
+
+
+        </div><footer class="p-strip is-shallow page-footer">
+    <div class="row">
+        <div class="col-12  u-align--center">
+            <p>
+                © 2020 ssf
+            </p>
+        </div>
+    </div>
+</footer>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+.post-content {
+  table,
+  blockquote,
+  pre,
+  div,
+  ul,
+  ol,
+  dl,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    & + h1 {
+      @extend %sp--ph1;
+    }
+
+    & + h2 {
+      @extend %sp--ph2;
+    }
+
+    & + h3 {
+      @extend %sp--ph3;
+    }
+
+    & + h4 {
+      @extend %sp--ph4;
+    }
+
+    & + h5,
+    & + h6 {
+      @extend %sp--ph5;
+    }
+
+    & + .p-muted-heading {
+      @extend %sp--pmuted;
+    }
+  }
+
+  > hr {
+    margin-top: $sp-unit * 1.5;
+    margin-bottom: $sp-unit * 3.5;
+  }
+
+  > div {
+    margin-bottom: $sp-unit * 2.2;
+  }
+
+  .footnotes {
+    @extend %sp--ph1;
+  }
+}
+
+.p-aside {
+  @extend .u-sticky;
+}
+
+#TableOfContents {
+  @extend .p-table-of-contents__nav;
+
+  ul {
+    @extend .p-list;
+
+    li a {
+      @extend .p-table-of-contents__link;
+    }
+  }
+}

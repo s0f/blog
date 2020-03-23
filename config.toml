@@ -1,0 +1,68 @@
+baseURL = "http://devjs.online/"
+languageCode = "zh-cn"
+title = "ssf"
+enableRobotsTXT = true
+enableEmoji = true
+footnotereturnlinkcontents= "↩"
+hasCJKLanguage = true
+disqusShortname = ""      # disqus_shortname
+googleAnalytics = ""      # UA-XXXXXXXX-X
+copyright = ""   
+defaultContentLanguage = "zh-cn"
+[languages.zh-cn]
+  languageCode = "zh-cn"
+
+[permalinks]
+  post= "/:year/:month/:title/"
+
+[author]                  # essential                     # 必需
+  name = "孙树发"
+
+[params]
+  description = "记录日常学习中的一些笔记"
+  author = "孙树发"
+  toc = true    
+
+[sitemap]                 # essential                     # 必需
+  changefreq = "weekly"
+  priority = 0.5
+  filename = "sitemap.xml"
+
+[taxonomies]
+  tag = "tags"
+  series = "keywords"
+  category = "categories"
+
+[blackfriday]
+  hrefTargetBlank = true
+
+# 谷歌分析，分析站点访问
+googleAnalytics = true
+
+# 字数统计和预计时间
+moreMeta = true
+
+# 分页
+paginate = 10
+paginatePath = "page"
+
+[[menu.main]]             # config your menu              # 配置目录
+  name = "首页"
+  weight = 10
+  identifier = "home"
+  url = "/"
+[[menu.main]]
+  name = "文章"
+  weight = 20
+  identifier = "archives"
+  url = "/post/"
+[[menu.main]]
+  name = "标签"
+  weight = 30
+  identifier = "tags"
+  url = "/tags/"
+[[menu.main]]
+  name = "分类"
+  weight = 40
+  identifier = "categories"
+  url = "/categories/"

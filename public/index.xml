@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ssf</title>
+    <link>http://devjs.online/</link>
+    <description>Recent content on ssf</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 20 Aug 2017 21:38:52 +0800</lastBuildDate>
+    
+	<atom:link href="http://devjs.online/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>关于</title>
+      <link>http://devjs.online/about/</link>
+      <pubDate>Sun, 20 Aug 2017 21:38:52 +0800</pubDate>
+      
+      <guid>http://devjs.online/about/</guid>
+      <description>Hugo is a static site engine written in Go. It makes use of a variety of open source projects including: Cobra Viper J Walter Weatherman Cast Learn more and contribute on GitHub.</description>
+    </item>
+    
+    <item>
+      <title>Vue源码阅读一、代码的执行流程</title>
+      <link>http://devjs.online/2020/03/vue%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%80%E4%BB%A3%E7%A0%81%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Mon, 16 Mar 2020 23:19:01 +0800</pubDate>
+      
+      <guid>http://devjs.online/2020/03/vue%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%80%E4%BB%A3%E7%A0%81%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/</guid>
+      <description>&lt;p&gt;主要是从Vue创建实例开始，看它代码的执行过程，跟着这个过程来阅读Vue的源码，学习Vue的一些底层原理，通过把整个流程跑通后，再去仔细阅读Vue在一些细节上是怎么实现的。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

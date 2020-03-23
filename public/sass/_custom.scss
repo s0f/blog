@@ -1,0 +1,113 @@
+html {
+  font-weight: $font-weight-normal;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: $font-weight-bold;
+}
+
+p,
+td,
+th,
+pre,
+code,
+samp,
+kbd {
+  font-weight: $font-weight-normal;
+}
+
+p {
+  @extend .u-no-max-width;
+}
+
+.p-link--logo,
+.title-logo {
+  color: $color-dark !important;
+  font-weight: $font-weight-bold;
+  text-decoration: none !important;
+}
+
+.p-link--hashtag {
+  color: $color-mid-dark !important;
+}
+
+.p-inline-list-icons--share-links .p-inline-list__item {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.p-article-pagination__link--no-title {
+  &::before,
+  &::after {
+    top: 0.8rem !important;
+  }
+}
+
+.u-sticky {
+  position: sticky;
+  top: 0;
+}
+
+.u-inline {
+  display: inline;
+}
+
+.u-capitalized {
+  text-transform: capitalize;
+}
+
+.u-unselectable {
+  user-select: none;
+}
+
+.is-wrapper {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.page-banner {
+  background-color: $color-light;
+
+  &__image {
+    height: 300px;
+    width: 300px;
+  }
+
+  a {
+    color: darken($color-link, 10%);
+  }
+}
+
+.posts {
+  .row:first-child .col-12:first-child .p-card {
+    margin-top: 1.5rem;
+  }
+
+  .p-card h3 a {
+    color: $color-dark;
+  }
+}
+
+// Instagram card styling
+.card {
+  @extend .p-card;
+
+  .card-header {
+    @extend .p-heading--three;
+  }
+
+  .card-body {
+    padding-top: 0.5rem;
+  }
+}
+
+@media screen and (min-width: 772px) {
+  .col--share-links {
+    text-align: right;
+  }
+}
